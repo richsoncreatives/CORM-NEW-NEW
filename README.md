@@ -1,36 +1,28 @@
-# CORM — Static Website
+# CORM — Static Website Package
 
-This package is the cleaned, deployment-ready static version of the College of Relationship & Marriage (CORM) website.
-
-## Included
-
-- Static HTML pages
-- `site-overrides.css` for responsive styling and animations
-- `site.js` for mobile navigation, Nuggets accordion, counselor routing, and form submission
-- No framework or build step is required for this static package
+This package is a flat static HTML/CSS/vanilla-JS website for the College of Relationship & Marriage (CORM).
 
 ## Deployment
 
-### Cloudflare Pages
+The site is compatible with GitHub Pages, Cloudflare Pages, and other static hosts. No Node.js server or build command is required.
 
-Upload the contents of this folder as a static site, or connect the repository to Cloudflare Pages. No build command is required. The site output directory is the project root.
-
-### GitHub Pages
-
-Commit these files to a GitHub repository and enable GitHub Pages for the branch/folder containing the files. The site is plain HTML/CSS/JavaScript and does not require Node.js to run.
+Upload/publish the files in this directory as the site root. `index.html` is the homepage.
 
 ## Forms
 
-Counselor booking submissions are sent through FormSubmit to:
+Contact and counselor booking forms use FormSubmit and route submissions to:
 
 `collegeofrelationship@gmail.com`
 
-If the AJAX submission cannot be completed, the site falls back to opening the visitor's email application with the submission prepared.
+The forms include a native HTML `action` fallback so they remain usable on static hosting even if JavaScript/AJAX is unavailable.
 
-## Main updates
+**Important:** FormSubmit may require the receiving email address to confirm/activate the integration the first time a form is submitted. Check the CORM Gmail inbox for any FormSubmit activation email.
 
-- Responsive hamburger navigation for phones and tablets
-- Simplified counselor booking form: Name, Email, Phone, Preferred Date, Message
-- Selected counselor is displayed above the booking form and retained as a hidden routing value
-- Nuggets categories are collapsed by default and expand/collapse when clicked
-- Lightweight scroll reveals, card hover effects, and reduced-motion support
+## Updated in this release
+
+- Removed header navigation underline artifacts and tightened responsive navigation behavior.
+- Added a clean split-layout contact form with minimalist fields and a red “Send Message Securely” button.
+- Added native FormSubmit routing for contact and counselor booking forms.
+- Made counselor session controls real links as well as JavaScript-enhanced controls.
+- Set all 10 Nuggets categories to collapsed on initial load with smooth accordion expansion.
+- Retained lightweight scroll-reveal and card hover animations with reduced-motion support.

@@ -592,3 +592,145 @@ article.philosophy-item,
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ==========================================================================
+   CORM FINAL POLISH — HEADER, FORMS & STATIC ROUTING
+   ========================================================================== */
+
+/* Header: no underline artifacts on top navigation. Active state uses color only. */
+.site-header,
+.site-header * { box-sizing: border-box; }
+.site-header { overflow: visible !important; }
+.desktop-nav a,
+.desktop-nav a:hover,
+.desktop-nav a.active,
+.desktop-nav a:focus-visible {
+  border-bottom: 0 !important;
+  text-decoration: none !important;
+}
+.desktop-nav a {
+  padding: 31px 0 !important;
+  line-height: 1.2 !important;
+  transition: color .2s ease, transform .2s ease !important;
+}
+.desktop-nav a:hover { transform: translateY(-1px); }
+.desktop-nav a.active { color: #c00000 !important; }
+.header-cta,
+.header-cta:hover,
+.header-cta:focus-visible { text-decoration: none !important; border-bottom: 0 !important; }
+
+/* Keep the mobile drawer completely isolated from the desktop navigation. */
+.corm-mobile-nav { display: none !important; }
+@media (max-width: 1100px) {
+  .site-header .desktop-nav { display: none !important; }
+  .site-header .header-cta { display: none !important; }
+  .site-header .corm-mobile-trigger { display: inline-flex !important; }
+  .site-header.mobile-open .corm-mobile-nav {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+  .corm-mobile-nav {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity .2s ease, transform .2s ease, visibility .2s ease;
+  }
+  .corm-mobile-nav a { text-decoration: none !important; border-bottom: 1px solid #eee !important; }
+  .corm-mobile-nav a:hover,
+  .corm-mobile-nav a:focus-visible { text-decoration: none !important; color: #c00000 !important; }
+}
+
+/* Professional split contact/booking forms. */
+.contact-layout {
+  align-items: start !important;
+  gap: clamp(42px, 7vw, 110px) !important;
+}
+.contact-details { padding-right: clamp(0px, 2vw, 30px); }
+.contact-form-wrap,
+#booking-form-card {
+  background: #fff;
+  border: 1px solid #e9e5e1;
+  padding: clamp(26px, 4vw, 48px);
+  box-shadow: 0 14px 40px rgba(25,25,25,.055);
+}
+.contact-form-wrap h3 { margin: 10px 0 28px; font-size: clamp(26px, 3vw, 38px); }
+.inquiry-form .form-grid,
+.booking-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px 24px;
+}
+.inquiry-form .field,
+.booking-field { gap: 7px; }
+.inquiry-form .field span,
+.booking-field label {
+  color: #555;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  font: 700 10px/1.4 Montserrat, sans-serif;
+}
+.inquiry-form .field input,
+.inquiry-form .field textarea,
+.booking-field input,
+.booking-field textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 13px 0;
+  border: 0 !important;
+  border-bottom: 1px solid #cfcfcf !important;
+  border-radius: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #222;
+  font: 400 15px/1.55 Open Sans, sans-serif;
+  transition: border-color .2s ease, padding .2s ease;
+}
+.inquiry-form .field textarea,
+.booking-field textarea { min-height: 115px; resize: vertical; }
+.inquiry-form .field input:focus,
+.inquiry-form .field textarea:focus,
+.booking-field input:focus,
+.booking-field textarea:focus {
+  border-bottom-color: #c00000 !important;
+  padding-left: 4px;
+}
+.inquiry-form .field.wide,
+.booking-field.full { grid-column: 1 / -1; }
+.inquiry-form .button,
+.corm-booking-form .button {
+  width: 100%;
+  min-height: 54px;
+  margin-top: 28px;
+  justify-content: center;
+}
+.form-note { color: #777; font-size: 12px; line-height: 1.6; margin-top: 16px; }
+.selected-counselor-pill {
+  margin-bottom: 28px !important;
+  background: #faf7f3 !important;
+  border: 0 !important;
+  border-left: 3px solid #c00000 !important;
+  border-radius: 0 !important;
+}
+
+@media (max-width: 700px) {
+  .inquiry-form .form-grid,
+  .booking-form-grid { grid-template-columns: 1fr; gap: 18px; }
+  .inquiry-form .field.wide,
+  .booking-field.full { grid-column: auto; }
+  .contact-form-wrap,
+  #booking-form-card { padding: 24px 20px; }
+}
+
+/* Exactly ten category rows; all closed on initial load. */
+.nuggets-cat-content { overflow: hidden; }
+.nuggets-cat:not(.open) .nuggets-cat-content { grid-template-rows: 0fr !important; }
+.nuggets-cat.open .nuggets-cat-content { grid-template-rows: 1fr !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .corm-mobile-nav,
+  .desktop-nav a,
+  .nuggets-cat-content { transition: none !important; }
+}

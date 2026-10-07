@@ -105,6 +105,15 @@
 
   /* 3. Robust Event-Delegated Nuggets Accordion */
   function initNuggetsAccordion() {
+    // Always start with every category collapsed, including after a page reload.
+    $$('.nuggets-cat').forEach((cat) => {
+      cat.classList.remove('open');
+      const head = $('.nuggets-cat-head', cat);
+      const chevron = $('.nuggets-chevron', cat);
+      if (head) head.setAttribute('aria-expanded', 'false');
+      if (chevron) chevron.classList.remove('open');
+    });
+
     document.addEventListener('click', (e) => {
       // A. Category Header Click
       const headBtn = e.target.closest('.nuggets-cat-head');
@@ -232,12 +241,7 @@
     statusEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
-  function mailtoFallback(subject, body) {
-    const url = 'mailto:' + encodeURIComponent(TARGET_EMAIL) +
-      '?subject=' + encodeURIComponent(subject) +
-      '&body=' + encodeURIComponent(body);
-    window.location.href = url;
-  }
+
 
   function handleFormSubmission(form, formType) {
     form.addEventListener('submit', async (e) => {
@@ -291,24 +295,26 @@
           throw new Error(data.message || 'Server error occurred');
         }
       } catch (err) {
-        console.warn('Direct delivery fallback to mailto client:', err);
-
-        let mailBody = 'CORM Website Submission:\n\n';
-        for (const [key, val] of Object.entries(payload)) {
-          if (!key.startsWith('_')) {
-            mailBody += `${key}: ${val}\n`;
+        console.warn('AJAX delivery failed; falling back to native FormSubmit:', err);
+        // The form has a native FormSubmit action, so static hosting still works.
+        try {
+          const counselor = formData.get('counselor') || 'General';
+          const nativeSubject = formType === 'counselor_booking'
+            ? `[CORM Booking] Consultation Request: ${counselor}`
+            : `[CORM Website Inquiry] ${formData.get('subject') || 'Contact Message'}`;
+          let subjectField = $('input[name="_subject"]', form);
+          if (!subjectField) {
+            subjectField = document.createElement('input');
+            subjectField.type = 'hidden';
+            subjectField.name = '_subject';
+            form.appendChild(subjectField);
           }
+          subjectField.value = nativeSubject;
+          HTMLFormElement.prototype.submit.call(form);
+        } catch (fallbackErr) {
+          console.error('Native FormSubmit fallback failed:', fallbackErr);
+          showStatus(form, 'error', 'Unable to submit this form right now. Please email <strong>' + TARGET_EMAIL + '</strong> directly.');
         }
-
-        mailtoFallback(payload._subject, mailBody);
-
-        showStatus(
-          form,
-          'success',
-          '✓ Your email application has opened with your message addressed to <strong>' +
-          TARGET_EMAIL +
-          '</strong>. Please click "Send" to complete your submission.'
-        );
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
