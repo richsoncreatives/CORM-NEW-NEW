@@ -49,6 +49,23 @@
         trigger.setAttribute('aria-label', 'Open menu');
       }
     });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && header.classList.contains('mobile-open')) {
+        header.classList.remove('mobile-open');
+        trigger.setAttribute('aria-expanded', 'false');
+        trigger.setAttribute('aria-label', 'Open menu');
+        trigger.focus();
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 1100 && header.classList.contains('mobile-open')) {
+        header.classList.remove('mobile-open');
+        trigger.setAttribute('aria-expanded', 'false');
+        trigger.setAttribute('aria-label', 'Open menu');
+      }
+    });
   }
 
   /* 2. Floating "Direct Enquiries" Button */
@@ -129,29 +146,14 @@
 
   /* 4. Counselor Booking Flow with Dynamic Name Routing */
   function initCounselorBooking() {
-    const counselorSelect = $('#booking-counselor');
+    const counselorInput = $('#booking-counselor');
     const counselorDisplay = $('#selected-counselor-name');
     const bookingSection = $('#request');
 
     function selectCounselor(counselorName) {
       if (!counselorName) return;
 
-      if (counselorSelect) {
-        let found = false;
-        for (let i = 0; i < counselorSelect.options.length; i++) {
-          const optVal = counselorSelect.options[i].value.toLowerCase();
-          const target = counselorName.toLowerCase();
-          if (optVal.includes(target) || target.includes(optVal)) {
-            counselorSelect.selectedIndex = i;
-            found = true;
-            break;
-          }
-        }
-        if (!found) {
-          const newOpt = new Option(counselorName, counselorName, true, true);
-          counselorSelect.add(newOpt);
-        }
-      }
+      if (counselorInput) counselorInput.value = counselorName;
 
       if (counselorDisplay) {
         counselorDisplay.textContent = counselorName;
@@ -185,18 +187,6 @@
       }
     } catch (_) {}
 
-    if (counselorSelect && counselorDisplay) {
-      counselorSelect.addEventListener('change', () => {
-        counselorDisplay.textContent = counselorSelect.value || 'Any Available Counselor';
-      });
-    }
-
-    const changeBtn = $('#change-counselor-btn');
-    if (changeBtn && counselorSelect) {
-      changeBtn.addEventListener('click', () => {
-        counselorSelect.focus();
-      });
-    }
   }
 
   /* 5. Scroll-Triggered Reveal Animation */
