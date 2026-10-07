@@ -1,0 +1,8 @@
+{
+  "name": "CORM - College of Relationship & Marriage",
+  "description": "Website for the College of Relationship & Marriage featuring counselor consultations, digital library, and relationship resources.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

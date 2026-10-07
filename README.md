@@ -1,11 +1,27 @@
-<div align="center">
+# CORM Standalone Website
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+This package is a static, upload-ready rebuild based on the supplied Base44-exported HTML snapshots.
 
-  <h1>Built with AI Studio</h2>
+## Pages
+- index.html — Home
+- about.html — About Us
+- library.html — Digital Library
+- counselors.html — Counselors & Consultation
+- partnerships.html — Partnerships
+- operations.html — Operations Team
+- nuggets.html — Nuggets
+- contact.html — Contact & Contributions
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+## Upload
+Upload the contents of this folder to any static web host (including Cloudflare Pages, GitHub Pages, Netlify, or conventional shared hosting). No build command is required.
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+## Forms
+The exported Base44 pages contained frontend forms but no portable backend. The standalone version therefore opens the visitor's email client and prepares a message to collegeofrelationship@gmail.com. This keeps the site independent of Base44.
 
-</div>
+## External services intentionally retained
+- Selar book-store links
+- CORM social links
+- telephone and email links
+
+## Important
+The original supplied content and visual structure were preserved. Base44 internal navigation was converted to local static pages.
