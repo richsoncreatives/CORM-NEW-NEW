@@ -1,11 +1,11 @@
 /**
  * CORM (College of Relationship & Marriage) Core Client Scripts
- * - Responsive Mobile & Tablet Header Navigation (Touch + Click + Animated Icon)
+ * - Responsive Mobile Navigation
  * - Floating "Direct Enquiries" Button
- * - Robust Nuggets Accordion (Categories + Individual Reflections)
+ * - Robust Event Delegation Nuggets Accordion (Every Item & Category Expands/Collapses)
  * - Dynamic Counselor Session Booking & Cross-Page Routing
- * - Form Submissions Routed to collegeofrelationship@gmail.com
- * - High-End Scroll Reveal Animations & Micro-interactions
+ * - Secure Form Submissions to collegeofrelationship@gmail.com
+ * - Scroll-Triggered Reveal Animations
  */
 
 (function () {
@@ -17,97 +17,52 @@
   const $ = (selector, context = document) => context.querySelector(selector);
   const $$ = (selector, context = document) => Array.from(context.querySelectorAll(selector));
 
-  /* --------------------------------------------------------------------------
-     1. Responsive Header Mobile & Tablet Navigation
-     -------------------------------------------------------------------------- */
+  /* 1. Header Mobile Navigation */
   function initHeaderNav() {
     const header = $('.site-header');
-    if (!header) return;
+    const trigger = $('.corm-mobile-trigger');
+    const mobileNav = $('.corm-mobile-nav');
 
-    const triggers = $$('.corm-mobile-trigger, .menu-trigger', header);
-    const mobileNav = $('.corm-mobile-nav', header) || $('#corm-mobile-nav');
+    if (!header || !trigger) return;
 
-    if (!triggers.length) return;
-
-    function setMenuState(open) {
-      if (open) {
-        header.classList.add('mobile-open');
-      } else {
-        header.classList.remove('mobile-open');
-      }
-
-      triggers.forEach((trig) => {
-        trig.setAttribute('aria-expanded', String(open));
-        trig.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
-        
-        // Transform SVG icon between 3-lines hamburger and 'X' close icon
-        const svg = trig.querySelector('svg');
-        if (svg) {
-          if (open) {
-            svg.innerHTML = '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>';
-          } else {
-            svg.innerHTML = '<line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line>';
-          }
-        }
-      });
-
-      if (mobileNav) {
-        mobileNav.style.display = open ? 'flex' : 'none';
-      }
-    }
-
-    triggers.forEach((trigger) => {
-      trigger.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const isOpen = header.classList.contains('mobile-open');
-        setMenuState(!isOpen);
-      });
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = header.classList.toggle('mobile-open');
+      trigger.setAttribute('aria-expanded', String(isOpen));
+      trigger.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
     });
 
     if (mobileNav) {
       $$('a', mobileNav).forEach((link) => {
         link.addEventListener('click', () => {
-          setMenuState(false);
+          header.classList.remove('mobile-open');
+          trigger.setAttribute('aria-expanded', 'false');
+          trigger.setAttribute('aria-label', 'Open menu');
         });
       });
     }
 
-    // Close when tapping outside header
     document.addEventListener('click', (e) => {
       if (header.classList.contains('mobile-open') && !header.contains(e.target)) {
-        setMenuState(false);
-      }
-    });
-
-    // Close on Escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && header.classList.contains('mobile-open')) {
-        setMenuState(false);
-      }
-    });
-
-    // Close if window is resized past tablet breakpoint (> 1180px)
-    window.addEventListener('resize', () => {
-      if (window.innerWidth > 1180 && header.classList.contains('mobile-open')) {
-        setMenuState(false);
+        header.classList.remove('mobile-open');
+        trigger.setAttribute('aria-expanded', 'false');
+        trigger.setAttribute('aria-label', 'Open menu');
       }
     });
   }
 
-  /* --------------------------------------------------------------------------
-     2. Floating "Direct Enquiries" Button
-     -------------------------------------------------------------------------- */
+  /* 2. Floating "Direct Enquiries" Button */
   function initFloatingEnquiryButton() {
-    let btn = $('#floating-enquiry-btn');
+    const existing = $('#floating-enquiry-btn');
     const isContactPage = window.location.pathname.includes('contact') || document.title.toLowerCase().includes('contact');
 
+    let btn = existing;
     if (!btn) {
       btn = document.createElement('a');
       btn.id = 'floating-enquiry-btn';
       btn.className = 'floating-enquiry-btn';
       btn.setAttribute('aria-label', 'Direct Enquiries to CORM');
-      btn.href = isContactPage ? '#inquiry-form' : 'contact.html';
+      btn.href = isContactPage ? '#main' : 'contact.html';
       btn.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle">
           <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
@@ -121,7 +76,7 @@
     btn.addEventListener('click', (e) => {
       if (isContactPage) {
         e.preventDefault();
-        const target = $('#inquiry-form') || $('.inquiry-form') || $('#main');
+        const target = $('.inquiry-form') || $('#main');
         if (target) {
           target.scrollIntoView({ behavior: 'smooth', block: 'start' });
           const firstInput = $('input', target);
@@ -131,185 +86,52 @@
     });
   }
 
-  /* --------------------------------------------------------------------------
-     3. Robust Nuggets Accordion (Categories & Individual Nugget Cards)
-     -------------------------------------------------------------------------- */
-  function toggleCategory(catEl, shouldOpen) {
-    if (!catEl) return;
-    const headBtn = catEl.querySelector('.nuggets-cat-head');
-    const chevron = catEl.querySelector('.nuggets-chevron');
-    const content = catEl.querySelector('.nuggets-cat-content');
-
-    const currentlyOpen = catEl.classList.contains('open');
-    const makeOpen = shouldOpen !== undefined ? shouldOpen : !currentlyOpen;
-
-    if (makeOpen) {
-      catEl.classList.add('open');
-      if (headBtn) headBtn.setAttribute('aria-expanded', 'true');
-      if (chevron) chevron.classList.add('open');
-      if (content) {
-        content.style.gridTemplateRows = '1fr';
-      }
-    } else {
-      catEl.classList.remove('open');
-      if (headBtn) headBtn.setAttribute('aria-expanded', 'false');
-      if (chevron) chevron.classList.remove('open');
-      if (content) {
-        content.style.gridTemplateRows = '0fr';
-      }
-    }
-  }
-
-  function toggleNuggetCard(cardEl, shouldOpen) {
-    if (!cardEl) return;
-    const toggleBtn = cardEl.querySelector('.nugget-card-toggle');
-    const chevron = cardEl.querySelector('.nugget-toggle-icon');
-    const body = cardEl.querySelector('.nugget-body');
-
-    const currentlyCollapsed = cardEl.classList.contains('collapsed');
-    const makeOpen = shouldOpen !== undefined ? shouldOpen : currentlyCollapsed;
-
-    if (makeOpen) {
-      cardEl.classList.remove('collapsed');
-      cardEl.classList.add('expanded');
-      if (toggleBtn) {
-        toggleBtn.setAttribute('aria-expanded', 'true');
-        const txt = toggleBtn.querySelector('.toggle-text');
-        if (txt) txt.textContent = 'Hide reflection';
-      }
-      if (chevron) chevron.classList.add('open');
-      if (body) {
-        body.style.maxHeight = '2500px';
-        body.style.opacity = '1';
-        body.style.display = 'block';
-      }
-    } else {
-      cardEl.classList.add('collapsed');
-      cardEl.classList.remove('expanded');
-      if (toggleBtn) {
-        toggleBtn.setAttribute('aria-expanded', 'false');
-        const txt = toggleBtn.querySelector('.toggle-text');
-        if (txt) txt.textContent = 'Read reflection';
-      }
-      if (chevron) chevron.classList.remove('open');
-      if (body) {
-        body.style.maxHeight = '0px';
-        body.style.opacity = '0';
-      }
-    }
-  }
-
+  /* 3. Robust Event-Delegated Nuggets Accordion */
   function initNuggetsAccordion() {
-    const categories = $$('.nuggets-cat');
-    if (!categories.length) return;
-
-    // By default: ALL 10 categories collapsed as requested
-    categories.forEach((cat) => {
-      cat.classList.remove('open');
-      const headBtn = cat.querySelector('.nuggets-cat-head');
-      if (headBtn) headBtn.setAttribute('aria-expanded', 'false');
-      const chevron = cat.querySelector('.nuggets-chevron');
-      if (chevron) chevron.classList.remove('open');
-      const content = cat.querySelector('.nuggets-cat-content');
-      if (content) content.style.gridTemplateRows = '0fr';
-    });
-
-    // Ensure all individual nugget cards have a toggle button and clean header structure
-    const cards = $$('.nugget-card');
-    cards.forEach((card, idx) => {
-      if (!card.querySelector('.nugget-card-toggle')) {
-        const title = card.querySelector('h3');
-        const num = card.querySelector('.nugget-num');
-        const headerWrap = document.createElement('div');
-        headerWrap.className = 'nugget-card-header';
-        headerWrap.setAttribute('role', 'button');
-        headerWrap.setAttribute('tabindex', '0');
-        headerWrap.setAttribute('aria-label', `Toggle nugget ${idx + 1}`);
-
-        const textGroup = document.createElement('div');
-        textGroup.className = 'nugget-header-titles';
-        if (num) textGroup.appendChild(num);
-        if (title) textGroup.appendChild(title);
-
-        const toggleBtn = document.createElement('button');
-        toggleBtn.type = 'button';
-        toggleBtn.className = 'nugget-card-toggle';
-        toggleBtn.setAttribute('aria-expanded', 'true');
-        toggleBtn.innerHTML = `
-          <span class="toggle-text">Read reflection</span>
-          <svg class="lucide lucide-chevron-down nugget-toggle-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-        `;
-
-        headerWrap.appendChild(textGroup);
-        headerWrap.appendChild(toggleBtn);
-        card.insertBefore(headerWrap, card.firstChild);
-      }
-    });
-
-    // Delegated click event handler for complete reliability across all 100 nuggets & 10 categories
     document.addEventListener('click', (e) => {
-      // 1. Category Header Click
+      // A. Category Header Click
       const headBtn = e.target.closest('.nuggets-cat-head');
       if (headBtn) {
         e.preventDefault();
         const cat = headBtn.closest('.nuggets-cat');
-        if (cat) {
-          toggleCategory(cat);
+        if (!cat) return;
+
+        const chevron = cat.querySelector('.nuggets-chevron');
+        const isOpen = cat.classList.contains('open');
+
+        if (isOpen) {
+          cat.classList.remove('open');
+          headBtn.setAttribute('aria-expanded', 'false');
+          if (chevron) chevron.classList.remove('open');
+        } else {
+          cat.classList.add('open');
+          headBtn.setAttribute('aria-expanded', 'true');
+          if (chevron) chevron.classList.add('open');
         }
         return;
       }
 
-      // 2. Individual Nugget Card Header Click or Toggle Button Click
-      const cardHeader = e.target.closest('.nugget-card-header');
-      const cardToggle = e.target.closest('.nugget-card-toggle');
-      if (cardHeader || cardToggle) {
-        if (e.target.closest('a')) return; // Allow normal links inside cards
-        e.preventDefault();
-        const card = (cardHeader || cardToggle).closest('.nugget-card');
-        if (card) {
-          toggleNuggetCard(card);
-        }
-        return;
-      }
+      // B. Individual Nugget Card Header Click
+      const card = e.target.closest('.nugget-card');
+      if (card) {
+        if (e.target.closest('a') || e.target.closest('button')) return;
 
-      // 3. Quick Action: Expand All / Collapse All
-      const expandAllBtn = e.target.closest('#expand-all-nuggets-btn');
-      if (expandAllBtn) {
-        e.preventDefault();
-        categories.forEach(cat => toggleCategory(cat, true));
-        return;
-      }
-
-      const collapseAllBtn = e.target.closest('#collapse-all-nuggets-btn');
-      if (collapseAllBtn) {
-        e.preventDefault();
-        categories.forEach(cat => toggleCategory(cat, false));
-        return;
-      }
-    });
-
-    // Keyboard accessibility for card headers
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        const cardHeader = e.target.closest('.nugget-card-header');
-        if (cardHeader && !e.target.closest('a') && !e.target.closest('button')) {
+        const headerTrigger = e.target.closest('.nugget-card-header') ||
+                              e.target.closest('.nugget-card-toggle') ||
+                              e.target.closest('h3');
+        if (headerTrigger) {
           e.preventDefault();
-          const card = cardHeader.closest('.nugget-card');
-          if (card) toggleNuggetCard(card);
+          card.classList.toggle('collapsed');
         }
       }
     });
   }
 
-  /* --------------------------------------------------------------------------
-     4. Simplified Counselor Booking with Dynamic Routing
-     -------------------------------------------------------------------------- */
+  /* 4. Counselor Booking Flow with Dynamic Name Routing */
   function initCounselorBooking() {
     const counselorSelect = $('#booking-counselor');
     const counselorDisplay = $('#selected-counselor-name');
-    const bookingSection = $('#request') || $('#booking-form-card');
-    const changeBtn = $('#change-counselor-btn');
-    const selectWrapper = $('#counselor-select-wrapper');
+    const bookingSection = $('#request');
 
     function selectCounselor(counselorName) {
       if (!counselorName) return;
@@ -344,38 +166,13 @@
       }
     }
 
-    if (changeBtn && selectWrapper) {
-      changeBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const isHidden = selectWrapper.style.display === 'none';
-        selectWrapper.style.display = isHidden ? 'block' : 'none';
-        changeBtn.textContent = isHidden ? 'Close' : 'Change';
-        if (isHidden && counselorSelect) {
-          counselorSelect.focus();
-        }
-      });
-    }
-
-    if (counselorSelect && counselorDisplay) {
-      counselorSelect.addEventListener('change', () => {
-        counselorDisplay.textContent = counselorSelect.value || 'Any Available Counselor';
-      });
-    }
-
-    // Handle clicks on [data-counselor] buttons across the page
+    // Handle clicks on [data-counselor] buttons
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('.request-session-btn') || e.target.closest('[data-counselor]');
       if (btn) {
+        e.preventDefault();
         const cName = btn.getAttribute('data-counselor');
-        if (cName) {
-          if (window.location.pathname.includes('counselors') || window.location.href.includes('counselors')) {
-            e.preventDefault();
-            selectCounselor(cName);
-          } else {
-            // Route from other pages (e.g. index.html) to counselors page with query param
-            window.location.href = `counselors.html?counselor=${encodeURIComponent(cName)}#request`;
-          }
-        }
+        if (cName) selectCounselor(cName);
       }
     });
 
@@ -387,14 +184,25 @@
         setTimeout(() => selectCounselor(urlCounselor), 250);
       }
     } catch (_) {}
+
+    if (counselorSelect && counselorDisplay) {
+      counselorSelect.addEventListener('change', () => {
+        counselorDisplay.textContent = counselorSelect.value || 'Any Available Counselor';
+      });
+    }
+
+    const changeBtn = $('#change-counselor-btn');
+    if (changeBtn && counselorSelect) {
+      changeBtn.addEventListener('click', () => {
+        counselorSelect.focus();
+      });
+    }
   }
 
-  /* --------------------------------------------------------------------------
-     5. Scroll-Triggered Reveal Animations
-     -------------------------------------------------------------------------- */
+  /* 5. Scroll-Triggered Reveal Animation */
   function initScrollReveal() {
     const targets = $$(
-      'section, .nuggets-cat, .service-item, .team-card, .counselor-card, .book-card, .intake-card, .service-grid article, .values-grid article'
+      'section, .nuggets-cat, .service-item, .team-card, .book-card, .intake-card, .service-grid article, .values-grid article'
     );
     if (!targets.length) return;
 
@@ -412,7 +220,7 @@
           }
         });
       },
-      { rootMargin: '0px 0px -25px 0px', threshold: 0.04 }
+      { rootMargin: '0px 0px -30px 0px', threshold: 0.05 }
     );
 
     targets.forEach(el => {
@@ -421,9 +229,7 @@
     });
   }
 
-  /* --------------------------------------------------------------------------
-     6. Form Submissions Routed to collegeofrelationship@gmail.com
-     -------------------------------------------------------------------------- */
+  /* 6. Form Submission Handling with Routing to collegeofrelationship@gmail.com */
   function showStatus(form, type, message) {
     let statusEl = $('.form-status-msg', form.parentNode) || $('.form-status-msg', form);
     if (!statusEl) {
@@ -455,20 +261,14 @@
         submitBtn.innerHTML = 'Sending...';
       }
 
-      showStatus(form, 'loading', '⏳ Sending your details to the CORM team...');
+      showStatus(form, 'loading', '⏳ Sending your details to the CORM counseling & ministry team...');
 
       const formData = new FormData(form);
-      const counselorName = formData.get('counselor') || $('#selected-counselor-name')?.textContent || 'General Inquiry';
-      const senderName = formData.get('fullName') || formData.get('name') || 'Inquirer';
-      const senderEmail = formData.get('email') || '';
-
       const payload = {
         _subject: formType === 'counselor_booking'
-          ? `[CORM Consultation] Request for ${counselorName} - from ${senderName}`
-          : `[CORM Inquiry] ${formData.get('subject') || 'Contact Message'} - from ${senderName}`,
-        _replyto: senderEmail,
-        target_inbox: TARGET_EMAIL,
-        counselor_requested: counselorName,
+          ? `[CORM Booking] Consultation Request: ${formData.get('counselor') || 'General'}`
+          : `[CORM Website Inquiry] ${formData.get('subject') || 'Contact Message'}`,
+        _replyto: formData.get('email') || '',
         submitted_at: new Date().toISOString()
       };
 
@@ -492,19 +292,18 @@
           showStatus(
             form,
             'success',
-            '✓ <strong>Your request has been received!</strong> Your details were sent to <strong>' +
+            '✓ <strong>Your message has been received!</strong> Your inquiry has been sent directly to <strong>' +
             TARGET_EMAIL +
-            '</strong>' + (formType === 'counselor_booking' ? ` regarding <strong>${counselorName}</strong>.` : '.') +
-            ' Our team will follow up with you shortly.'
+            '</strong>. A member of our team will contact you shortly.'
           );
           form.reset();
         } else {
           throw new Error(data.message || 'Server error occurred');
         }
       } catch (err) {
-        console.warn('Fallback to native mail client:', err);
+        console.warn('Direct delivery fallback to mailto client:', err);
 
-        let mailBody = 'CORM Consultation Request:\n\n';
+        let mailBody = 'CORM Website Submission:\n\n';
         for (const [key, val] of Object.entries(payload)) {
           if (!key.startsWith('_')) {
             mailBody += `${key}: ${val}\n`;
@@ -516,9 +315,9 @@
         showStatus(
           form,
           'success',
-          '✓ Your email app has been opened with your request addressed to <strong>' +
+          '✓ Your email application has opened with your message addressed to <strong>' +
           TARGET_EMAIL +
-          '</strong>. Please send the email to complete your request.'
+          '</strong>. Please click "Send" to complete your submission.'
         );
       } finally {
         if (submitBtn) {
@@ -544,9 +343,7 @@
     });
   }
 
-  /* --------------------------------------------------------------------------
-     7. Initialize on DOM Ready
-     -------------------------------------------------------------------------- */
+  /* 7. Initialize Everything Cleanly */
   function initAll() {
     initHeaderNav();
     initFloatingEnquiryButton();
